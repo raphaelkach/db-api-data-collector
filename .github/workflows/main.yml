@@ -6,24 +6,27 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '*/10 * * * *'  # Every 10 minutes
+    - cron: '*/10 * * * *'  # Alle 10 Minuten
   workflow_dispatch:
+
+permissions:
+  contents: write  # Schreibberechtigungen für das Repository
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Repository auschecken
+        uses: actions/checkout@v4  # Stelle sicher, dass die neueste Version verwendet wird
 
-      - name: Set up Python
+      - name: Python-Version festlegen
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Cache Poetry dependencies
-        uses: actions/cache@v3
+      - name: Cache für Poetry installieren
+        uses: actions/cache@v4  # Verwende Version v4, um sicherzustellen, dass Node.js 20 verwendet wird
         with:
           path: |
             ~/.cache/pypoetry
@@ -32,23 +35,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-poetry-
 
-      - name: Install Poetry
+      - name: Poetry installieren
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           export PATH="$HOME/.local/bin:$PATH"
           poetry --version
 
-      - name: Install dependencies
+      - name: Abhängigkeiten installieren
         run: |
           export PATH="$HOME/.local/bin:$PATH"
+          poetry run pip install --no-cache-dir charset-normalizer==3.3.0
           poetry install --no-interaction --no-ansi
 
-      - name: Linting with flake8
+      - name: Linting mit flake8
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           poetry run flake8 .
 
-      - name: Run tests
+      - name: Tests ausführen
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           poetry run pytest
@@ -59,16 +63,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Repository auschecken
+        uses: actions/checkout@v4  # Aktualisiere auf die neueste Version
 
-      - name: Set up Python
+      - name: Python-Version festlegen
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Cache Poetry dependencies
-        uses: actions/cache@v3
+      - name: Cache für Poetry installieren
+        uses: actions/cache@v4  # Verwende Version v4, um sicherzustellen, dass Node.js 20 verwendet wird
         with:
           path: |
             ~/.cache/pypoetry
@@ -77,18 +81,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-poetry-
 
-      - name: Install Poetry
+      - name: Poetry installieren
         run: |
           curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.4.2 python3 -
           export PATH="$HOME/.local/bin:$PATH"
           poetry --version
 
-      - name: Install dependencies
+      - name: Abhängigkeiten installieren
         run: |
           export PATH="$HOME/.local/bin:$PATH"
+          poetry run pip install --no-cache-dir charset-normalizer==3.3.0
           poetry install --no-interaction --no-ansi
 
-      - name: Run script
+      - name: Skript ausführen
         env:
           DB_CLIENT_ID: ${{ secrets.DB_CLIENT_ID }}
           DB_API_KEY: ${{ secrets.DB_API_KEY }}
@@ -96,13 +101,12 @@ jobs:
           export PATH="$HOME/.local/bin:$PATH"
           poetry run python main.py
 
-      - name: Commit and push changes
-        uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Änderungen committen und pushen
+        uses: stefanzweifel/git-auto-commit-action@v4  # Bleibt unverändert, falls die neueste Version verwendet wird
         with:
-          commit_message: 'Automated data collection update'
+          commit_message: 'Automatisches Update der gesammelten Daten'
           file_pattern: |
             01_data/01_raw/API/*
             01_data/01_raw/API/logs/*
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
