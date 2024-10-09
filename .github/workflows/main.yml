@@ -55,7 +55,7 @@ jobs:
 
   collect-data:
     needs: build-and-test
-    if: github.repository_owner == '<dein-benutzername>'
+    if: github.repository_owner == 'raphaelkach'
     runs-on: ubuntu-latest
 
     steps:
