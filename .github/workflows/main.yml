@@ -41,9 +41,8 @@ jobs:
       - name: Abhängigkeiten installieren
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          poetry run pip install --no-cache-dir charset-normalizer==3.3.0
+          poetry run pip install --no-cache-dir charset-normalizer==3.3.0  # Fix für charset-normalizer
           poetry install --no-interaction --no-ansi
-
 
       - name: Linting mit flake8
         run: |
@@ -85,10 +84,10 @@ jobs:
           export PATH="$HOME/.local/bin:$PATH"
           poetry --version
 
-
       - name: Abhängigkeiten installieren
         run: |
           export PATH="$HOME/.local/bin:$PATH"
+          poetry run pip install --no-cache-dir charset-normalizer==3.3.0  # Fix für charset-normalizer
           poetry install --no-interaction --no-ansi
 
       - name: Skript ausführen
