@@ -106,7 +106,7 @@ def save_data(plan_df, change_df, timestamp):
 
 
 def get_past_hours():
-    n_hours = 7  # Anzahl der Stunden
+    n_hours = 2  # Anzahl der Stunden
     current_time = datetime.datetime.now(berlin_tz)
     past_hours = []
     for i in range(1, n_hours + 1):
