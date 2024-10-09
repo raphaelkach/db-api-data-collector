@@ -1,0 +1,57 @@
+name: Daten sammeln
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # Alle 10 Minuten
+  workflow_dispatch:
+
+jobs:
+  collect-data:
+    runs-on: ubuntu-latest
+
+    # Verhindert Ausführung in Forks
+    if: github.repository_owner == 'raphaelkach'
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v3
+
+      - name: Cache für Poetry installieren
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pypoetry
+            **/site-packages
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Poetry installieren
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          export PATH="$HOME/.local/bin:$PATH"
+          poetry --version
+
+      - name: Abhängigkeiten installieren
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          poetry install --no-interaction --no-ansi
+
+      - name: Skript ausführen
+        env:
+          DB_CLIENT_ID: ${{ secrets.DB_CLIENT_ID }}
+          DB_API_KEY: ${{ secrets.DB_API_KEY }}
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          poetry run python main.py
+
+      - name: Änderungen committen und pushen
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'Automatisches Update der gesammelten Daten'
+          file_pattern: |
+            01_data/01_raw/API/*
+            01_data/01_raw/API/logs/*

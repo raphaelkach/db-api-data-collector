@@ -1,0 +1,16 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtuelle Umgebung
+.venv/
+.env
+
+# Poetry Dateien (falls du die Lock-Datei nicht versionieren möchtest)
+# Wenn du die Lock-Datei versionieren möchtest, kommentiere die nächste Zeile aus
+# poetry.lock
+
+# Sonstige
+*.tmp
+*.log

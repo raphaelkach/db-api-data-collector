@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "db-api-data-collector"
+version = "0.1.0"
+description = ""
+authors = ["raphaelkach <wi23146@lehre.dhbw-stuttgart.de>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pandas = "^2.2.3"
+requests = "^2.32.3"
+pytz = "^2024.2"
+xmltodict = "^0.14.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
