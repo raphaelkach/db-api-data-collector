@@ -9,7 +9,6 @@ on:
     - cron: '*/10 * * * *'  # Alle 10 Minuten
   workflow_dispatch:
 
-# Setze die Berechtigungen für das GITHUB_TOKEN, damit der Workflow auf das Repository schreiben kann.
 permissions:
   contents: write  # Schreibberechtigungen für das Repository
 
@@ -19,7 +18,7 @@ jobs:
 
     steps:
       - name: Repository auschecken
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  # Stelle sicher, dass die neueste Version verwendet wird
 
       - name: Python-Version festlegen
         uses: actions/setup-python@v4
@@ -27,7 +26,7 @@ jobs:
           python-version: '3.11'
 
       - name: Cache für Poetry installieren
-        uses: actions/cache@v3
+        uses: actions/cache@v4  # Verwende Version v4, um sicherzustellen, dass Node.js 20 verwendet wird
         with:
           path: |
             ~/.cache/pypoetry
@@ -45,7 +44,7 @@ jobs:
       - name: Abhängigkeiten installieren
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          poetry run pip install --no-cache-dir charset-normalizer==3.3.0  # Fix für charset-normalizer
+          poetry run pip install --no-cache-dir charset-normalizer==3.3.0
           poetry install --no-interaction --no-ansi
 
       - name: Linting mit flake8
@@ -65,7 +64,7 @@ jobs:
 
     steps:
       - name: Repository auschecken
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  # Aktualisiere auf die neueste Version
 
       - name: Python-Version festlegen
         uses: actions/setup-python@v4
@@ -73,7 +72,7 @@ jobs:
           python-version: '3.11'
 
       - name: Cache für Poetry installieren
-        uses: actions/cache@v3
+        uses: actions/cache@v4  # Verwende Version v4, um sicherzustellen, dass Node.js 20 verwendet wird
         with:
           path: |
             ~/.cache/pypoetry
@@ -91,7 +90,7 @@ jobs:
       - name: Abhängigkeiten installieren
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          poetry run pip install --no-cache-dir charset-normalizer==3.3.0  # Fix für charset-normalizer
+          poetry run pip install --no-cache-dir charset-normalizer==3.3.0
           poetry install --no-interaction --no-ansi
 
       - name: Skript ausführen
@@ -103,11 +102,11 @@ jobs:
           poetry run python main.py
 
       - name: Änderungen committen und pushen
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v4  # Bleibt unverändert, falls die neueste Version verwendet wird
         with:
           commit_message: 'Automatisches Update der gesammelten Daten'
           file_pattern: |
             01_data/01_raw/API/*
             01_data/01_raw/API/logs/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Verwende das eingebaute GitHub Token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
