@@ -105,3 +105,5 @@ jobs:
           file_pattern: |
             01_data/01_raw/API/*
             01_data/01_raw/API/logs/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Verwende das eingebaute GitHub Token
