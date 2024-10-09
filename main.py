@@ -7,23 +7,23 @@ import os
 import logging
 
 # Logging konfigurieren
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s:%(message)s")
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s:%(message)s')
 
 API_HEADERS = {
-    "DB-Client-ID": os.getenv("DB_CLIENT_ID"),
-    "DB-Api-Key": os.getenv("DB_API_KEY"),
-    "accept": "application/xml",
+    "DB-Client-ID": os.getenv('DB_CLIENT_ID'),
+    "DB-Api-Key": os.getenv('DB_API_KEY'),
+    "accept": "application/xml"
 }
 
 # Definiere den Pfad relativ zum Skriptstandort
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIONS_FILEPATH = os.path.join(
-    BASE_DIR, "01_data", "01_raw", "Stationen_S-Bahnnetz_Stuttgart.csv"
+    BASE_DIR, '01_data', '01_raw', 'Stationen_S-Bahnnetz_Stuttgart.csv'
 )
-OUTPUT_DIR = os.path.join(BASE_DIR, "01_data", "01_raw", "API")
-LOG_DIR = os.path.join(OUTPUT_DIR, "logs")
+OUTPUT_DIR = os.path.join(BASE_DIR, '01_data', '01_raw', 'API')
+LOG_DIR = os.path.join(OUTPUT_DIR, 'logs')
 
-berlin_tz = pytz.timezone("Europe/Berlin")
+berlin_tz = pytz.timezone('Europe/Berlin')
 
 
 def load_station_data(filepath=STATIONS_FILEPATH):
@@ -38,7 +38,7 @@ def load_station_data(filepath=STATIONS_FILEPATH):
         stations_df["zipcode"].values,
         stations_df["long"].values,
         stations_df["lat"].values,
-        stations_df["category"].values,
+        stations_df["category"].values
     )
 
 
@@ -51,24 +51,24 @@ def create_output_dir():
 
 def log_csv_activity(log_file, csv_file):
     timestamp = datetime.datetime.now(berlin_tz).strftime("%Y-%m-%d %H:%M:%S")
-    with open(log_file, "a") as f:
+    with open(log_file, 'a') as f:
         f.write(f"CSV '{csv_file}' wurde um {timestamp} überschrieben.\n")
 
 
 def save_data(plan_df, change_df, timestamp):
     merged_df = pd.merge(
-        plan_df, change_df, how="left", on="ID", suffixes=("_plan", "_change")
+        plan_df, change_df, how='left', on='ID', suffixes=('_plan', '_change')
     )
 
     # Berechnen der Verspätungen
-    merged_df["arrival_delay_m"] = (
-        pd.to_datetime(merged_df["changed_arrival"], format="%y%m%d%H%M")
-        - pd.to_datetime(merged_df["planned_arrival"], format="%y%m%d%H%M")
+    merged_df['arrival_delay_m'] = (
+        pd.to_datetime(merged_df['changed_arrival'], format='%y%m%d%H%M') -
+        pd.to_datetime(merged_df['planned_arrival'], format='%y%m%d%H%M')
     ).dt.total_seconds() / 60
 
-    merged_df["departure_delay_m"] = (
-        pd.to_datetime(merged_df["changed_departure"], format="%y%m%d%H%M")
-        - pd.to_datetime(merged_df["planned_departure"], format="%y%m%d%H%M")
+    merged_df['departure_delay_m'] = (
+        pd.to_datetime(merged_df['changed_departure'], format='%y%m%d%H%M') -
+        pd.to_datetime(merged_df['planned_departure'], format='%y%m%d%H%M')
     ).dt.total_seconds() / 60
 
     # Überprüfen, ob die Verspätungswerte ungültig sind
@@ -93,7 +93,7 @@ def save_data(plan_df, change_df, timestamp):
         old_data = pd.read_csv(merged_file)
         if not old_data.empty:
             logging.info(
-                f"Gültige Daten bereits vorhanden, Datei für {timestamp} wird nicht überschrieben."
+                f"Gültige Daten vorhanden, Datei für {timestamp} nicht überschrieben."
             )
             return
 
@@ -142,10 +142,10 @@ def parse_xml(response):
 def process_data(plan_root, change_root, eva_nr, metadata):
     plan_data, change_data = [], []
 
-    for s in plan_root.findall(".//s"):
+    for s in plan_root.findall('.//s'):
         plan_data.append(extract_plan_data(s, eva_nr, metadata))
 
-    for s in change_root.findall(".//s"):
+    for s in change_root.findall('.//s'):
         change_data.append(extract_change_data(s))
 
     return pd.DataFrame(plan_data), pd.DataFrame(change_data)
@@ -230,13 +230,13 @@ def job():
         logging.info(f"Verarbeitung von Stunde {hour} des Datums {date}.")
         for i, eva_nr in enumerate(eva_nrs):
             metadata = {
-                "name": names[i],
-                "state": states[i],
-                "city": cities[i],
-                "zipcode": zipcodes[i],
-                "long": longs[i],
-                "lat": lats[i],
-                "category": categories[i],
+                'name': names[i],
+                'state': states[i],
+                'city': cities[i],
+                'zipcode': zipcodes[i],
+                'long': longs[i],
+                'lat': lats[i],
+                'category': categories[i]
             }
 
             response_plan, response_change = fetch_api_data(eva_nr, date, hour)
