@@ -6,27 +6,24 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '*/10 * * * *'  # Alle 10 Minuten
+    - cron: '*/10 * * * *'  # Every 10 minutes
   workflow_dispatch:
-
-permissions:
-  contents: write  # Schreibberechtigungen für das Repository
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Repository auschecken
-        uses: actions/checkout@v4  # Stelle sicher, dass die neueste Version verwendet wird
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Python-Version festlegen
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Cache für Poetry installieren
-        uses: actions/cache@v4  # Verwende Version v4, um sicherzustellen, dass Node.js 20 verwendet wird
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
         with:
           path: |
             ~/.cache/pypoetry
@@ -35,24 +32,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-poetry-
 
-      - name: Poetry installieren
+      - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           export PATH="$HOME/.local/bin:$PATH"
           poetry --version
 
-      - name: Abhängigkeiten installieren
+      - name: Install dependencies
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          poetry run pip install --no-cache-dir charset-normalizer==3.3.0
           poetry install --no-interaction --no-ansi
 
-      - name: Linting mit flake8
+      - name: Linting with flake8
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           poetry run flake8 .
 
-      - name: Tests ausführen
+      - name: Run tests
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           poetry run pytest
@@ -63,16 +59,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Repository auschecken
-        uses: actions/checkout@v4  # Aktualisiere auf die neueste Version
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Python-Version festlegen
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Cache für Poetry installieren
-        uses: actions/cache@v4  # Verwende Version v4, um sicherzustellen, dass Node.js 20 verwendet wird
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
         with:
           path: |
             ~/.cache/pypoetry
@@ -81,19 +77,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-poetry-
 
-      - name: Poetry installieren
+      - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.4.2 python3 -
           export PATH="$HOME/.local/bin:$PATH"
           poetry --version
 
-      - name: Abhängigkeiten installieren
+      - name: Install dependencies
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          poetry run pip install --no-cache-dir charset-normalizer==3.3.0
           poetry install --no-interaction --no-ansi
 
-      - name: Skript ausführen
+      - name: Run script
         env:
           DB_CLIENT_ID: ${{ secrets.DB_CLIENT_ID }}
           DB_API_KEY: ${{ secrets.DB_API_KEY }}
@@ -101,12 +96,13 @@ jobs:
           export PATH="$HOME/.local/bin:$PATH"
           poetry run python main.py
 
-      - name: Änderungen committen und pushen
-        uses: stefanzweifel/git-auto-commit-action@v4  # Bleibt unverändert, falls die neueste Version verwendet wird
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: 'Automatisches Update der gesammelten Daten'
+          commit_message: 'Automated data collection update'
           file_pattern: |
             01_data/01_raw/API/*
             01_data/01_raw/API/logs/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true
