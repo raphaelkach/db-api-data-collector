@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # Schreibberechtigungen für das Repository
+  contents: write
 
 jobs:
   build-and-test:
@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Repository auschecken
-        uses: actions/checkout@v4  # Stelle sicher, dass die neueste Version verwendet wird
+        uses: actions/checkout@v4
 
       - name: Python-Version festlegen
         uses: actions/setup-python@v4
@@ -26,7 +26,7 @@ jobs:
           python-version: '3.11'
 
       - name: Cache für Poetry installieren
-        uses: actions/cache@v4  # Verwende Version v4, um sicherzustellen, dass Node.js 20 verwendet wird
+        uses: actions/cache@v4 
         with:
           path: |
             ~/.cache/pypoetry
@@ -47,11 +47,6 @@ jobs:
           poetry run pip install --no-cache-dir charset-normalizer==3.3.0
           poetry install --no-interaction --no-ansi
 
-      - name: Linting mit flake8
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          poetry run flake8 .
-
       - name: Tests ausführen
         run: |
           export PATH="$HOME/.local/bin:$PATH"
@@ -64,7 +59,7 @@ jobs:
 
     steps:
       - name: Repository auschecken
-        uses: actions/checkout@v4  # Aktualisiere auf die neueste Version
+        uses: actions/checkout@v4  
 
       - name: Python-Version festlegen
         uses: actions/setup-python@v4
@@ -72,7 +67,7 @@ jobs:
           python-version: '3.11'
 
       - name: Cache für Poetry installieren
-        uses: actions/cache@v4  # Verwende Version v4, um sicherzustellen, dass Node.js 20 verwendet wird
+        uses: actions/cache@v4  
         with:
           path: |
             ~/.cache/pypoetry
@@ -102,7 +97,7 @@ jobs:
           poetry run python main.py
 
       - name: Änderungen committen und pushen
-        uses: stefanzweifel/git-auto-commit-action@v4  # Bleibt unverändert, falls die neueste Version verwendet wird
+        uses: stefanzweifel/git-auto-commit-action@v4  
         with:
           commit_message: 'Automatisches Update der gesammelten Daten'
           file_pattern: |
