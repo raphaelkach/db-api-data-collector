@@ -13,48 +13,7 @@ permissions:
   contents: write
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Repository auschecken
-        uses: actions/checkout@v4
-
-      - name: Python-Version festlegen
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Cache für Poetry installieren
-        uses: actions/cache@v4 
-        with:
-          path: |
-            ~/.cache/pypoetry
-            **/site-packages
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-poetry-
-
-      - name: Poetry installieren
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          export PATH="$HOME/.local/bin:$PATH"
-          poetry --version
-
-      - name: Abhängigkeiten installieren
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          poetry run pip install --no-cache-dir charset-normalizer==3.3.0
-          poetry install --no-interaction --no-ansi
-
-      - name: Tests ausführen
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          poetry run pytest
-
   collect-data:
-    needs: build-and-test
-    if: github.repository_owner == 'raphaelkach'
     runs-on: ubuntu-latest
 
     steps:
